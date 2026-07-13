@@ -1,0 +1,58 @@
+/* 1. Global Reset & Box Sizing */
+*, *::before, *::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* 2. Document & Body Defaults */
+html {
+    /* Smooth scrolling for anchor links */
+    scroll-behavior: smooth;
+}
+
+body {
+    /* Ensures consistent rendering on Mac/Windows */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+
+    /* Prevents default browser spacing */
+    min-height: 100vh;
+    line-height: 1.5;
+    font-family: Roboto, sans-serif;
+}
+
+/* 3. Form & Input Resets */
+input, button, textarea, select {
+    font: inherit;
+}
+
+/* 4. Media Resets */
+img, picture, video, canvas, svg {
+    display: block;
+    max-width: 100%;
+}
+
+.container {
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+
+.auth-button {
+    width: 120px;
+    height: 40px;
+    background-color: #00599E;
+    color: #fff;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    border: none;
+}
+
