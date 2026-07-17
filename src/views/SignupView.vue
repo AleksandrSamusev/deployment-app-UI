@@ -1,5 +1,6 @@
 <script setup>
 import {ref} from "vue";
+import axios from "axios";
 
 const user = ref({
   firstName: '',
@@ -9,8 +10,41 @@ const user = ref({
   passwordConfirm: '',
 });
 
-function handleSubmit() {
-  console.log(user.value);
+async function handleSubmit() {
+  // Optional Frontend Check: Validate passwords match before hitting BE
+  if(user.value.password !== user.value.passwordConfirm) {
+    alert("Passwords do not match");
+    return;
+  }
+  try {
+    // Make POST request to Spring Boot Controller
+    const response = await axios.post("http://localhost:8080/api/v1/users", {
+      firstName: user.value.firstName,
+      lastName: user.value.lastName,
+      email: user.value.email,
+      password: user.value.password
+    });
+    // Handle Backend Success Contract (Status 201 Created)
+    if (response.status === 201) {
+      alert("Sign up successful!");
+      // Here we will implement redirect to your Login page using your Vue router later
+    }
+    user.value = {
+      firstName: "",
+      lastName: "",
+      email: "",
+      password: "",
+      passwordConfirm: "",
+    }
+  } catch (error) {
+    // Handle validation / server failures
+    if (error.response && error.response.status === 400) {
+      alert("Validation error: " + JSON.stringify(error.response.data));
+    } else {
+      alert("An unexpected error occurred. Please try again later.");
+    }
+    console.error("Signup error: ", error);
+  }
 }
 </script>
 
