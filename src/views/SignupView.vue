@@ -1,6 +1,10 @@
 <script setup>
 import {ref} from "vue";
+import {useRouter} from 'vue-router'
 import axios from "axios";
+
+const router = useRouter();
+const isLoading = ref(false);
 
 const user = ref({
   firstName: '',
@@ -11,23 +15,25 @@ const user = ref({
 });
 
 async function handleSubmit() {
-  // Optional Frontend Check: Validate passwords match before hitting BE
+  if (isLoading.value) {
+    return;
+  }
   if(user.value.password !== user.value.passwordConfirm) {
     alert("Passwords do not match");
     return;
   }
   try {
-    // Make POST request to Spring Boot Controller
-    const response = await axios.post("http://localhost:8080/api/v1/users", {
+    isLoading.value = true;
+    const response = await axios.post("http://localhost:8080/api/auth/signup", {
       firstName: user.value.firstName,
       lastName: user.value.lastName,
       email: user.value.email,
       password: user.value.password
     });
-    // Handle Backend Success Contract (Status 201 Created)
     if (response.status === 201) {
-      alert("Sign up successful!");
-      // Here we will implement redirect to your Login page using your Vue router later
+      const token = response.data.token;
+      localStorage.setItem("auth_token", token);
+      await router.push("/devstash");
     }
     user.value = {
       firstName: "",
@@ -37,19 +43,21 @@ async function handleSubmit() {
       passwordConfirm: "",
     }
   } catch (error) {
+    isLoading.value = false;
     // Handle validation / server failures
     if (error.response && error.response.status === 400) {
       alert("Validation error: " + JSON.stringify(error.response.data));
+    } else if (error.response && (error.response.status === 403 || error.response.status === 401)) {
+      alert("Invalid Credentials");
     } else {
       alert("An unexpected error occurred. Please try again later.");
     }
-    console.error("Signup error: ", error);
   }
 }
 </script>
 
 <template>
-  <div class="form-container">
+  <form @submit.prevent="handleSubmit" class="form-container">
     <h1>Sign Up</h1>
     <div class="rows-container">
       <div class="flex-row">
@@ -74,8 +82,8 @@ async function handleSubmit() {
       </div>
       <p>Note: all fields required</p>
     </div>
-    <button type="submit" @click="handleSubmit()" class="auth-button">Continue</button>
-  </div>
+    <button type="submit" :disabled="isLoading" class="auth-button">{{isLoading? 'Processing..' : 'Continue'}}</button>
+  </form>
 </template>
 
 <style scoped>
@@ -85,8 +93,8 @@ async function handleSubmit() {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  width: 500px;
-  height: 500px;
+  width: 650px;
+  height: auto;
 }
 
 .rows-container {
@@ -97,7 +105,7 @@ async function handleSubmit() {
   width: 100%;
   padding: 0 40px;
   gap: 20px;
-  margin-bottom: 40px;
+  margin-bottom: 50px;
 }
 
 .flex-row {
@@ -105,34 +113,41 @@ async function handleSubmit() {
   flex-direction: row;
   width: 100%;
   justify-content: space-between;
-  gap: 50px;
 }
 
 input {
   padding: 2px 0 2px 5px;
   border: none;
+  outline: none;
   border-bottom: 1px solid black;
   color: black;
+  font-size: 1.4rem;
+  width: 55%
 }
 
 input::placeholder {
   color: lightgrey;
-  font-size: 0.9rem;
+  font-size: 1rem;
 }
 
 h1 {
-  margin-bottom: 40px;
+  margin-bottom: 60px;
+  font-size: 3rem;
 }
 
 p {
   align-self: flex-end;
-  font-size: 0.75rem;
+  font-size: 1rem;
   color: firebrick;
+}
+
+label {
+  font-size: 1.5rem;
 }
 
 label span {
   color: firebrick;
   font-weight: bold;
-  font-size: 0.9rem;
+  font-size: 1.2rem;
 }
 </style>
