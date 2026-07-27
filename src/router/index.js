@@ -12,12 +12,14 @@ const routes = [
     {
         path: '/login',
         name: 'login',
-        component: LoginView
+        component: LoginView,
+        meta: {requiresGuest: true}
     },
     {
         path: '/signup',
         name: 'signup',
-        component: SignupView
+        component: SignupView,
+        meta: {requiresGuest: true}
     },
     {
         path: '/devstash', // inner project dashboard path
@@ -39,7 +41,17 @@ router.beforeEach((to, from, next) => {
         } else {
             next();
         }
-    } else {
+    }
+
+    else if(to.matched.some(record => record.meta['requiresGuest'])) {
+        if(hasToken) {
+           next('/devstash');
+        } else {
+            next();
+        }
+    }
+
+    else {
         next();
     }
 })

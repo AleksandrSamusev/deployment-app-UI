@@ -58,8 +58,9 @@ async function handleSubmit() {
       </div>
       <p>Note: all fields required</p>
     </div>
+    <button type="submit" :disabled="isLoading" class="auth-button">{{isLoading? 'Processing...' : 'Continue'}}</button>
   </form>
-  <button type="submit" :disabled="isLoading" class="auth-button">{{isLoading? 'Processing...' : 'Continue'}}</button>
+
 </template>
 
 <style scoped>
